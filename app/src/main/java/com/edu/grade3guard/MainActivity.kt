@@ -2,11 +2,14 @@ package com.edu.grade3guard
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,12 +24,25 @@ class MainActivity : AppCompatActivity() {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 64, 48, 48)
+            setBackgroundColor(Color.parseColor("#F7FAFC"))
         }
 
         val title = TextView(this).apply {
             text = "حارس المذاكرة - الصف الثالث الابتدائي"
             textSize = 22f
-            setPadding(0, 0, 0, 32)
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.parseColor("#0D47A1"))
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 12)
+        }
+
+        val subtitle = TextView(this).apply {
+            text = "إعداد وتطوير: م. أحمد فريد"
+            textSize = 16f
+            setTypeface(null, Typeface.BOLD)
+            setTextColor(Color.parseColor("#1E88E5"))
+            gravity = Gravity.CENTER
+            setPadding(0, 0, 0, 36)
         }
 
         val btnOverlay = Button(this).apply {
@@ -77,6 +93,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val btnChangePin = Button(this).apply {
+            text = "تغيير الرقم السري لولي الأمر"
+            setOnClickListener {
+                val input = EditText(this@MainActivity).apply { hint = "اكتب الرقم السري الجديد" }
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle("تعيين رقم سري جديد")
+                    .setView(input)
+                    .setPositiveButton("حفظ") { _, _ ->
+                        val newPin = input.text.toString().trim()
+                        if (newPin.length >= 4) {
+                            prefs.edit().putString("parent_pin", newPin).apply()
+                            Toast.makeText(this@MainActivity, "تم حفظ الرقم السري الجديد ✅", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@MainActivity, "الرقم السري يجب أن يكون 4 أرقام أو أكثر", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("إلغاء", null)
+                    .show()
+            }
+        }
+
         val btnStop = Button(this).apply {
             text = "إيقاف المراقبة (يتطلب الرقم السري)"
             setOnClickListener {
@@ -98,11 +135,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val footer = TextView(this).apply {
+            text = "بإشراف وتصميم: أحمد فريد"
+            textSize = 14f
+            setTextColor(Color.parseColor("#546E7A"))
+            gravity = Gravity.CENTER
+            setPadding(0, 40, 0, 0)
+        }
+
         layout.addView(title)
+        layout.addView(subtitle)
         layout.addView(btnOverlay)
         layout.addView(btnBattery)
         layout.addView(btnStart)
+        layout.addView(btnChangePin)
         layout.addView(btnStop)
+        layout.addView(footer)
 
         setContentView(layout)
     }
